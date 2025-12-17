@@ -205,7 +205,10 @@ def compute_quality_flags(summary: DatasetSummary, missing_df: pd.DataFrame,
     # Простейший «скор» качества
     score = 1.0
     score -= max_missing_share  # чем больше пропусков, тем хуже
-    score -= unique_ids #Корректировка расчёта интегрального показателя, чтобы он учитывал новый фактор
+    if flags["has_many_zero_values"]: #Использование новой эвристики has_many_zero_values в скоре качества данных
+        score -= 0.2 #Вычитаем, если много пропусков (эвристика has_many_zero_values)
+    if unique_ids: #Использование новой эвристики has_suspicious_id_duplicates в скоре качества данных
+        score -= 0.2 #Вычитаем, если много повторяющихся id (эвристика has_suspicious_id_duplicates)
     if summary.n_rows < 100:
         score -= 0.2
     if summary.n_cols > 100:
